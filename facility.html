@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Facility Reservation Portal</title>
+  <style>
+    /* === RESET & BASE === */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      color: #2c3e50;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* === NAVBAR === */
+    nav {
+      background: #3498db;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    nav h2 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+    nav a {
+      color: #fff;
+      margin-left: 1.2rem;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.3s;
+    }
+    nav a:hover {
+      opacity: 0.8;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin: 2rem 0;
+      color: #3498db;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* === CONTAINER === */
+    .container {
+      flex: 1;
+      max-width: 900px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem 2rem;
+    }
+
+    section.full {
+      grid-template-columns: 1fr;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      display: block;
+      color: #34495e;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.9rem;
+      border: 2px solid #bdc3c7;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #f9fbfd;
+    }
+    input:focus, select:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+      outline: none;
+      background: #fff;
+    }
+
+    /* === BUTTON === */
+    button {
+      grid-column: span 2;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    button:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+    button::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.2);
+      transition: left 0.4s ease;
+    }
+    button:hover::after {
+      left: 100%;
+    }
+
+    /* === CONFIRMATION MODAL === */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 16px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+    }
+    .modal.success {
+      border: 3px solid #2ecc71;
+    }
+    .modal.error {
+      border: 3px solid #e74c3c;
+    }
+    .modal h3 {
+      margin-top: 0;
+    }
+    .close-btn {
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      background: #3498db;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .close-btn:hover {
+      background: #2980b9;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    /* === FOOTER === */
+    footer {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: auto;
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+      section {
+        grid-template-columns: 1fr;
+      }
+      button {
+        grid-column: 1;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+    }
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+      nav h2 {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <h2>🏫 Facility Portal</h2>
+    <div>
+      <a href="#">Home</a>
+      <a href="#">My Reservations</a>
+      <a href="#">Contact</a>
+    </div>
+  </nav>
+
+  <h1>Facility Reservation Portal</h1>
+
+  <div class="container">
+    <section>
+      <div>
+        <label for="userName">Your Name</label>
+        <input type="text" id="userName" placeholder="Enter your name" />
+      </div>
+      <div>
+        <label for="facilityType">Facility Type</label>
+        <select id="facilityType" onchange="updateOptions()">
+          <option value="">-- Select --</option>
+          <option value="Study Room">Study Room</option>
+          <option value="Sports Facility">Sports Facility</option>
+          <option value="Event Space">Event Space</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="facilityOption">Choose Facility</label>
+        <select id="facilityOption"></select>
+      </div>
+      <div>
+        <label for="date">Date</label>
+        <input type="date" id="date" />
+      </div>
+
+      <div>
+        <label for="time">Time</label>
+        <input type="time" id="time" />
+      </div>
+      <button onclick="reserve()">Reserve Now</button>
+    </section>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="confirmationModal">
+    <div class="modal-content" id="modalContent">
+      <h3 id="modalTitle"></h3>
+      <p id="modalMessage"></p>
+      <button class="close-btn" onclick="closeModal()">OK</button>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 Facility Reservation Portal. All rights reserved.
+  </footer>
+
+  <script>
+    const facilities = {
+      "Study Room": ["Room A", "Room B", "Room C"],
+      "Sports Facility": ["Basketball Court", "Badminton Court", "Swimming Pool"],
+      "Event Space": ["Auditorium", "Open Lawn", "Conference Hall"]
+    };
+
+    function updateOptions() {
+      const type = document.getElementById("facilityType").value;
+      const optionSelect = document.getElementById("facilityOption");
+      optionSelect.innerHTML = "";
+      if (facilities[type]) {
+        facilities[type].forEach(fac => {
+          const opt = document.createElement("option");
+          opt.value = fac;
+          opt.textContent = fac;
+          optionSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function reserve() {
+      const name = document.getElementById("userName").value;
+      const type = document.getElementById("facilityType").value;
+      const facility = document.getElementById("facilityOption").value;
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+      const modal = document.getElementById("confirmationModal");
+      const modalContent = document.getElementById("modalContent");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalMessage = document.getElementById("modalMessage");
+
+      if (!name || !type || !facility || !date || !time) {
+        modalContent.className = "modal-content error";
+        modalTitle.innerText = "⚠ Missing Information";
+        modalMessage.innerText = "Please fill all fields before reserving.";
+      } else {
+        modalContent.className = "modal-content success";
+        modalTitle.innerText = "✅ Reservation Confirmed!";
+        modalMessage.innerText = `${name}, you've booked ${facility} (${type}) on ${date} at ${time}.`;
+      }
+      modal.style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("confirmationModal").style.display = "none";
+    }
+  </script>
+</body>
+</html>

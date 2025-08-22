@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus Mobile App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone-container {
+            width: min(375px, 100vw);
+            height: min(812px, 100vh);
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .screen {
+            position: absolute;
+            top: 44px;
+            left: 0;
+            right: 0;
+            bottom: 80px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .screen.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .screen.prev {
+            transform: translateX(-100%);
+        }
+
+        .screen-inner {
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+        }
+
+        /* Home Screen */
+        .home-screen {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .notification-badge {
+            position: relative;
+            font-size: 24px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 10px;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .welcome-text h2 {
+            font-size: clamp(20px, 5vw, 24px);
+            margin-bottom: 5px;
+        }
+
+        .welcome-text p {
+            opacity: 0.8;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .action-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .action-card:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-5px);
+        }
+
+        .action-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .action-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .action-subtitle {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        /* Navigation Tabs */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            min-width: 60px;
+        }
+
+        .nav-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-item:not(.active) {
+            color: #999;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Map Screen */
+        .map-screen {
+            background: #f8fafc;
+            min-height: 100%;
+        }
+
+        .map-header {
+            background: white;
+            padding: 15px 20px;
+            margin: -20px -20px 20px -20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-bar {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            background: #f1f5f9;
+            border-radius: 25px;
+            font-size: 14px;
+        }
+
+        .search-bar::placeholder {
+            color: #64748b;
+        }
+
+        .map-area {
+            height: 300px;
+            background: linear-gradient(45deg, #e8f5e8, #f0f8ff);
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ddd" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        }
+
+        .location-pins {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pin {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 20px 20px 20px 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .nearby-places h3 {
+            font-size: 18px;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+
+        .place-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .place-icon {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .place-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .place-info h4 {
+            font-size: 16px;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .place-info p {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .distance {
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* Profile Screen */
+        .profile-screen {
+            background: #f8fafc;
+            min-height: 100%;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            margin: -20px -20px 20px -20px;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+
+        .profile-name {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-role {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover {
+            color: #667eea;
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #667eea;
+            flex-shrink: 0;
+        }
+
+        .menu-text {
+            flex: 1;
+            font-size: 16px;
+            color: #1e293b;
+        }
+
+        .menu-arrow {
+            font-size: 16px;
+            color: #cbd5e1;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.2s;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: transform 0.2s;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.open .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            flex: 1;
+            transition: all 0.2s;
+        }
+
+        .btn.primary {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            
+            .phone-container {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+                padding: 0;
+            }
+
+            .phone-screen {
+                border-radius: 0;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .profile-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .phone-container {
+                width: 400px;
+                height: 850px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                padding: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span id="status-time">9:41 AM</span>
+                <span>Smart Campus</span>
+                <span id="battery">87%</span>
+            </div>
+
+            <!-- Home Screen -->
+            <div class="screen active" id="home">
+                <div class="screen-inner">
+                    <div class="home-screen">
+                        <div class="header">
+                            <div class="user-profile">
+                                <div class="avatar" id="user-avatar">AK</div>
+                                <div class="welcome-text">
+                                    <h2 id="greeting">Good Morning</h2>
+                                    <p>
+                                        <strong id="user-name">Manoj kumar</strong><br>
+                                        <small id="current-date">Friday, Aug 22</small>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="notification-badge" onclick="showNotifications()">
+                                🔔
+                                <span class="badge">3</span>
+                            </div>
+                        </div>
+
+                        <div class="quick-actions">
+                            <div class="action-card" onclick="showScreen('map')">
+                                <span class="action-icon">🗺</span>
+                                <div class="action-title">Campus Map</div>
+                                <div class="action-subtitle">Find locations</div>
+                            </div>
+                            <div class="action-card" onclick="showClasses()">
+                                <span class="action-icon">📚</span>
+                                <div class="action-title">My Classes</div>
+                                <div class="action-subtitle">Today: 3 classes</div>
+                            </div>
+                            <div class="action-card" onclick="showDigitalID()">
+                                <span class="action-icon">🎫</span>
+                                <div class="action-title">Digital ID</div>
+                                <div class="action-subtitle">Student card</div>
+                            </div>
+                            <div class="action-card" onclick="showAttendance()">
+                                <span class="action-icon">📊</span>
+                                <div class="action-title">Attendance</div>
+                                <div class="action-subtitle">87% this month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Screen -->
+            <div class="screen" id="map">
+                <div class="screen-inner">
+                    <div class="map-screen">
+                        <div class="map-header">
+                            <input type="text" class="search-bar" placeholder="Search campus locations...">
+                            <button onclick="getCurrentLocation()">📍</button>
+                        </div>
+
+                        <div class="map-area">
+                            <div class="map-overlay"></div>
+                            <div class="location-pins">
+                                <div class="pin" title="Library">📚</div>
+                                <div class="pin" title="Cafeteria">🍽</div>
+                                <div class="pin" title="Lab Building">🔬</div>
+                            </div>
+                        </div>
+
+                        <div class="nearby-places">
+                            <h3>Nearby Places</h3>
+                            <div class="place-item">
+                                <div class="place-icon">📚</div>
+                                <div class="place-info">
+                                    <h4>Central Library</h4>
+                                    <p>Open 24/7 • Study halls available</p>
+                                </div>
+                                <div class="distance">120m</div>
+                            </div>
+                            <div class="place-item">
+                                <div class="place-icon">🍽</div>
+                                <div class="place-info">
+                                    <h4>Main Cafeteria</h4>
+                                    <p>Open 7 AM - 10 PM • Multiple cuisines</p>
+                                </div>
+                                <div class="distance">85m</div>
+                            </div>
+                            <div class="place-item">
+                                <div class="place-icon">🔬</div>
+                                <div class="place-info">
+                                    <h4>Computer Lab</h4>
+                                    <p>Block C, 3rd Floor • 50 workstations</p>
+                                </div>
+                                <div class="distance">200m</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Screen -->
+            <div class="screen" id="profile">
+                <div class="screen-inner">
+                    <div class="profile-screen">
+                        <div class="profile-header">
+                            <div class="profile-avatar" id="profile-avatar">AK</div>
+                            <div class="profile-name" id="profile-name">Arjun Kumar</div>
+                            <div class="profile-role">Computer Science • 3rd Year</div>
+                        </div>
+
+                        <div class="profile-stats">
+                            <div class="stat-card">
+                                <div class="stat-number">87%</div>
+                                <div class="stat-label">Attendance</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">8.5</div>
+                                <div class="stat-label">CGPA</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">6</div>
+                                <div class="stat-label">Semester</div>
+                            </div>
+                        </div>
+
+                        <div class="profile-menu">
+                            <div class="menu-item">
+                                <div class="menu-icon">🎓</div>
+                                <div class="menu-text">Academic Records</div>
+                                <div class="menu-arrow">›</div>
+                            </div>
+                            <div class="menu-item">
+                                <div class="menu-icon">💳</div>
+                                <div class="menu-text">Fee Payment</div>
+                                <div class="menu-arrow">›</div>
+                            </div>
+                            <div class="menu-item">
+                                <div class="menu-icon">📅</div>
+                                <div class="menu-text">Time Table</div>
+                                <div class="menu-arrow">›</div>
+                            </div>
+                            <div class="menu-item">
+                                <div class="menu-icon">⚙️</div>
+                                <div class="menu-text">Settings</div>
+                                <div class="menu-arrow">›</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="showScreen('home')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('map')">
+                    <div class="nav-icon">🗺</div>
+                    <div class="nav-label">Map</div>
+                </div>
+                <div class="nav-item" onclick="showScreen('profile')">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-label">Profile</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+            updateBattery();
+        });
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHour = ((hours + 11) % 12 + 1);
+            
+            document.getElementById('status-time').textContent = `${displayHour}:${minutes} ${ampm}`;
+            
+            let greeting = 'Good Evening';
+            if (hours < 12) greeting = 'Good Morning';
+            else if (hours < 18) greeting = 'Good Afternoon';
+            
+            document.getElementById('greeting').textContent = greeting;
+            
+            const dateStr = now.toLocaleDateString(undefined, { 
+                weekday: 'long', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            document.getElementById('current-date').textContent = dateStr;
+        }
+
+        // Update battery (mock)
+        function updateBattery() {
+            if (navigator.getBattery) {
+                navigator.getBattery().then(battery => {
+                    const percent = Math.round(battery.level * 100);
+                    const charging = battery.charging;
+                    document.getElementById('battery').textContent = 
+                        `${percent}%${charging ? ' ⚡' : ''}`;
+                });
+            }
+        }
+
+        // Screen navigation
+        function showScreen(screenId) {
+            // Remove active class from all screens and nav items
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active', 'prev');
+            });
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show target screen
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            }
+
+            // Update nav
+            const navItem = document.querySelector(`.nav-item[onclick="showScreen('${screenId}')"]`);
+            if (navItem) {
+                navItem.classList.add('active');
+            }
+        }
+
+        // Modal functions
+        function createModal(title, content, buttons = []) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            
+            modal.innerHTML = `
+                <div class="modal-card">
+                    <div class="modal-header">
+                        <h3>${title}</h3>
+                        <button class="modal-close" onclick="closeModal(this)">×</button>
+                    </div>
+                    <div class="modal-body">
+                        ${content}
+                    </div>
+                    ${buttons.length ? `
+                        <div class="modal-footer">
+                            ${buttons.map(btn => `
+                                <button class="btn ${btn.primary ? 'primary' : ''}" 
+                                        onclick="${btn.action}">
+                                    ${btn.text}
+                                </button>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close on overlay click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal(modal.querySelector('.modal-close'));
+                }
+            });
+            
+            setTimeout(() => modal.classList.add('open'), 10);
+            return modal;
+        }
+
+        function closeModal(closeBtn) {
+            const modal = closeBtn.closest('.modal-overlay');
+            modal.classList.remove('open');
+            setTimeout(() => modal.remove(), 200);
+        }
+
+        function showNotifications() {
+            const content = `
+                <div style="space-y: 15px;">
+                    <div style="padding: 15px; background: #f8f9ff; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <strong>Assignment Due</strong><br>
+                        <small>Data Structures Lab - Due tomorrow</small>
+                    </div>
+                    <div style="padding: 15px; background: #f0f9f0; border-radius: 8px; border-left: 4px solid #10b981; margin-top: 10px;">
+                        <strong>Grade Updated</strong><br>
+                        <small>Operating Systems Quiz - 92/100</small>
+                    </div>
+                    <div style="padding: 15px; background: #fff8f0; border-radius: 8px; border-left: 4px solid #f59e0b; margin-top: 10px;">
+                        <strong>Library Book Due</strong><br>
+                        <small>"Computer Networks" - Return by Aug 25</small>
+                    </div>
+                </div>
+            `;
+            
+            createModal('📔 Notifications', content, [
+                { text: 'Mark All Read', action: 'closeModal(this)' },
+                { text: 'Close', action: 'closeModal(this)', primary: true }
+            ]);
+        }
+
+        function showClasses() {
+            const content = `
+                <div style="space-y: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <div>
+                            <strong>Data Structures</strong><br>
+                            <small>Room 204 • Prof. Smith</small>
+                        </div>
+                        <div style="text-align: right; font-weight: bold; color: #667eea;">9:00 AM</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
+                        <div>
+                            <strong>Operating Systems</strong><br>
+                            <small>Lab 3 • Dr. Johnson</small>
+                        </div>
+                        <div style="text-align: right; font-weight: bold; color: #667eea;">11:00 AM</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-

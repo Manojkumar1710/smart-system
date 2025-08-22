@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus Management - Digital Solutions for Modern Universities</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo::before {
+            content: "🎓";
+            font-size: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 120px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: slideInUp 1s ease forwards;
+        }
+
+        .hero .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: slideInUp 1s ease 0.3s forwards;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: slideInUp 1s ease 0.6s forwards;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(255, 107, 107, 0.4);
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: #f8fafc;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Solutions Section */
+        .solutions {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .solution-item {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .solution-item:hover {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .solution-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .stat-item p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 0;
+            background: #1a202c;
+            color: white;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: #0f172a;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .footer-section a {
+            color: #cbd5e1;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #667eea;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .features-grid,
+            .solutions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Floating Elements */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        /* Auth Buttons */
+.auth-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Common Button Style */
+.btn {
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-weight: bold;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Shine Effect */
+.btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.3);
+    transform: skewX(-30deg);
+    transition: 0.5s;
+}
+.btn:hover::before {
+    left: 100%;
+}
+
+/* Login Button */
+.login-btn {
+    background: linear-gradient(45deg, #00c6ff, #0072ff);
+    color: white;
+}
+.login-btn:hover {
+    transform: translateY(-4px) scale(1.07);
+    box-shadow: 0 8px 25px rgba(106, 173, 240, 0.7);
+}
+
+/* Sign Up Button */
+.signup-btn {
+    background: linear-gradient(45deg, #ff6a00, #ee0979);
+    color: white;
+}
+.signup-btn:hover {
+    transform: translateY(-4px) scale(1.07);
+    box-shadow: 0 8px 25px rgba(238,9,121,0.7);
+}
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+<header>
+    <nav class="container">
+        <div class="logo">Smart Campus</div>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#solutions">Solutions</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+
+        <!-- Added Auth Buttons -->
+        <div class="auth-buttons">
+            <a href="login.html" class="btn login-btn">Login</a>
+            <a href="login.html" class="btn signup-btn">Sign Up</a>
+        </div>
+    </nav>
+</header>
+
+
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Transform Your Campus Experience</h1>
+                <p class="subtitle">Comprehensive digital solutions combining web, mobile, and IoT technologies to create smarter, more connected university campuses</p>
+                <a href="#features" class="cta-button">Discover Solutions</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Revolutionizing Campus Life</h2>
+                <p>Our integrated platform brings together cutting-edge technology to enhance every aspect of student life</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card floating">
+                    <span class="feature-icon">📱</span>
+                    <a href="http://127.0.0.1:5500/mobile.html" role="button" aria-label="Open Mobile-First Design" style="position:absolute;inset:0;border-radius:inherit;z-index:3;background:transparent;text-decoration:none;"></a>
+                    <h3>Mobile-First Design</h3>
+                    <p>Native mobile applications for iOS and Android, ensuring students can access all campus services from their smartphones with intuitive, responsive interfaces.</p>
+                </div>
+                <div class="feature-card floating" style="animation-delay: 0.2s;">
+                    <span class="feature-icon">🌐</span>
+                    <h3>Web Platfrom</h3>
+                    <a href="https://www.srkrexams.in/login.aspx" role="button" aria-label="Open webportal for students" style="position:absolute;inset:0;border-radius:inherit;z-index:3;background:transparent;text-decoration:none;" target="_blank"></a>
+
+                   
+                    <p>Comprehensive web dashboard for administrators and students, providing real-time analytics, management tools, and seamless integration across all campus services.</p>
+                </div>
+                <div class="feature-card floating" style="animation-delay: 0.4s;">
+                    <span class="feature-icon">🔗</span>
+                    <h3>IoT Integration</h3>
+                    <a href="http://127.0.0.1:5500/iot.html" role="button" aria-label="open event managements of a college" style="position:absolute;inset:0;border-radius:inherit;z-index:3;background:transparent;text-decoration:none;" target="_blank"></a>
+                    <p>Smart sensors and connected devices throughout campus provide real-time data on occupancy, environmental conditions, and resource utilization.</p>
+                </div>
+                <div class="feature-card floating" style="animation-delay: 0.6s;">
+                    <span class="feature-icon">🎯</span>
+                    <h3>Event Management</h3>
+                    <a href="https://srkrec.edu.in" role="button" aria-label="open event managements of a college" style="position:absolute;inset:0;border-radius:inherit;z-index:3;background:transparent;text-decoration:none;" target="_blank"></a>
+                    <p>Complete event lifecycle management from planning to execution, with automated notifications, attendance tracking, and feedback collection systems.</p>
+                </div>
+                <div class="feature-card floating" style="animation-delay: 0.8s;">
+                    <span class="feature-icon">🔍</span>
+                    <h3>Lost & Found</h3>
+                    <a href="http://127.0.0.1:5500/lost.html" role="button" aria-label="Open lostFoundItems design" style="position:absolute;inset:0;border-radius:inherit;z-index:3;background:transparent;text-decoration:none;"></a>
+                    <p>AI-powered matching system for lost items with image recognition, location tracking, and automated notifications to reunite students with their belongings.</p>
+                </div>
+                <div class="feature-card floating" style="animation-delay: 1s;">
+                    <span class="feature-icon" aria-label="Canteen" title="Canteen">🍱</span>
+                    <h3>cafteria</h3>
+                    <a href="cafteria.html" role="button" aria-label="open cafteria details" style="position:absolute;inset:0;border-radius:inherit;z-index:3;background:transparent;text-decoration:none;" target="_blank"></a>
+                    <p>Real-time cafeteria and service queue tracking with predictive wait times, mobile ordering, and capacity optimization algorithms.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solutions Section -->
+    <section class="solutions" id="solutions">
+        <div class="container">
+            <div class="section-title">
+                <h2>Comprehensive Campus Solutions</h2>
+                <p>Every tool you need to create a modern, efficient, and student-friendly campus environment</p>
+            </div>
+            <div class="solutions-grid">
+                <div class="solution-item">
+                    <span class="solution-icon">🗺</span>
+                    <h3>Campus Navigation</h3>
+                    <a href="https://www.google.com/maps/search/srkr+college+map/@16.5444632,81.4952124,18z/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI1MDgxOS4wIKXMDSoASAFQAw%3D%3D" role="button" aria-label="Open student services " style="position:absolute;inset:0;border-radius:inherit;z-index:3;background:transparent;text-decoration:none;" target="_blank"></a>
+                    <p>Interactive maps with turn-by-turn directions, building information, and accessibility routes</p>
+                </div>
+                <div class="solution-item">
+                    <span class="solution-icon">🍽</span>
+                    <h3>Dining Services</h3>
+                    <p>Menu updates, nutritional information, pre-ordering, and real-time cafeteria occupancy</p>
+                    <a href="cafteria.html" role="button" aria-label="open cafteria details" style="position:absolute;inset:0;border-radius:inherit;z-index:3;background:transparent;text-decoration:none;" target="_blank"></a>
+                </div>
+                <div class="solution-item">
+                    <span class="solution-icon">🏢</span>
+                    <h3>Facility Booking</h3>
+                    
+                    <a href="facility.html" role="button" aria-label="Open facility design" style="position:absolute;inset:0;border-radius:inherit;z-index:3;background:transparent;text-decoration:none;"></a>
+                    <p>Reserve study rooms, sports facilities, and event spaces with instant confirmation</p>
+                </div>
+                <div class="solution-item">
+                    <span class="solution-icon">📊</span>
+                    <h3>Analytics Dashboard</h3>
+                    <a href="https://srkrec.edu.in/placements_details.php" role="button" aria-label="open cafteria details" style="position:absolute;inset:0;border-radius:inherit;z-index:3;background:transparent;text-decoration:none;" target="_blank"></a>
+                    <p>Comprehensive insights into campus usage patterns, student engagement, and resource optimization</p>
+                </div>
+                <div class="solution-item">
+                    <span class="solution-icon">🔔</span>
+                    <h3>Smart Notifications</h3>
+                    <p>Personalized alerts for events, emergencies, academic deadlines, and campus announcements</p>
+                </div>
+                <div class="solution-item">
+                    <span class="solution-icon">🎓</span>
+                    <h3>Student Services</h3>
+                    <a href="https://www.srkrexams.in/login.aspx" role="button" aria-label="Open student services " style="position:absolute;inset:0;border-radius:inherit;z-index:3;background:transparent;text-decoration:none;" target="_blank"></a>
+                    <p>Digital access to academic records, course registration, and administrative services</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="section-title">
+                <h2 style="color: white;">Proven Impact</h2>
+                <p style="color: rgba(255,255,255,0.9);">Real results from universities using our smart campus solutions</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>85%</h3>
+                    <p>Reduction in Queue Wait Times</p>
+                </div>
+                <div class="stat-item">
+                    <h3>92%</h3>
+                    <p>Student Satisfaction Rate</p>
+                </div>
+                <div class="stat-item">
+                    <h3>40%</h3>
+                    <p>Increase in Event Attendance</p>
+                </div>
+                <div class="stat-item">
+                    <h3>98%</h3>
+                    <p>Lost Items Recovery Rate</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Transform Your Campus?</h2>
+            <p>Join hundreds of universities already using our smart campus management solutions</p>
+            <a href="#contact" class="cta-button">Get Started Today</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Solutions</h4> 
+                    <a href="https://srkrec.edu.in/" role="button" target="_blank">Event Management</a>
+                    <a href="http://127.0.0.1:5500/lost.html" role="button" target="_blank">Lost & Found</a>
+                    <a href="http://127.0.0.1:5500/cap.html" role="button" target="_blank">cafteria</a>
+                    <a href="#">Campus Navigation</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <a href="https://www.srkrexams.in/login.aspx"  role="button" target="_blank" >Web Dashboard</a>
+                    <a href="http://127.0.0.1:5500/mobile.html" role="button" target="_blank">Mobile Apps</a>
+                    <a href="#">IoT Integration</a>
+                    <a href="http://127.0.0.1:5500/iot.html" role="button" target="_blank">Analytics</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <a href="#">Documentation</a>
+                    <a href="#">API Reference</a>
+                    <a href="#">Help Center</a>
+                    <a href="#">Contact Us</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <a href="#">About Us</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+            <div style="border-top: 1px solid #334155; padding-top: 2rem; color: #64748b;">
+                <p>&copy; 2025 Smart Campus Management. All rights reserved. Empowering universities with intelligent digital solutions.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Header background change on scroll
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(102, 126, 234, 0.95)';
+            } else {
+                header.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Add fade-in class to elements and observe them
+        document.querySelectorAll('.feature-card, .solution-item, .stat-item').forEach(el => {
+            el.classList.add('fade-in');
+            observer.observe(el);
+        });
+
+        // Counter animation for stats
+        const animateCounters = () => {
+            const counters = document.querySelectorAll('.stat-item h3');
+            counters.forEach(counter => {
+                const target = parseInt(counter.innerText);
+                const increment = target / 100;
+                let current = 0;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.innerText = target + (counter.innerText.includes('%') ? '%' : '');
+                        clearInterval(timer);
+                    } else {
+                        counter.innerText = Math.floor(current) + (counter.innerText.includes('%') ? '%' : '');
+                    }
+                }, 20);
+            });
+        };
+
+        // Trigger counter animation when stats section is visible
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        });
+
+        const statsSection = document.querySelector('.stats');
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+
+        // Add interactive hover effects
+        document.querySelectorAll('.feature-card, .solution-item').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

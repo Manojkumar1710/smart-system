@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cafeteria Queue & Ordering — Professional Responsive</title>
+  <meta name="description" content="Cafeteria Queue Tracker and Ordering System — responsive, professional UI with menu categories, availability, search, live clock and order management." />
+  <style>
+    /* ===========================================
+       RESET & BASE
+    ============================================ */
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#175fd0;
+      --accent-2:#24b47e;
+      --danger:#e14b4b;
+      --glass: rgba(255,255,255,0.6);
+      --shadow: 0 8px 24px rgba(20,20,40,0.06);
+      --radius: 12px;
+      --maxWidth:1200px;
+      --glass-border: rgba(255,255,255,0.6);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      background: linear-gradient(180deg,#f3f6fb 0%, var(--bg) 100%);
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:32px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      gap:24px;
+      font-size:15px;
+      line-height:1.4;
+    }
+    .container{
+      width:100%;
+      max-width:var(--maxWidth);
+      display:grid;
+      grid-template-columns: 320px 1fr;
+      gap:24px;
+      align-items:start;
+    }
+
+    /* ===========================================
+       SIDEBAR / NAV
+    ============================================ */
+    .sidebar{
+      background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.5));
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(20,20,40,0.04);
+      position:sticky;
+      top:24px;
+      height:calc(100vh - 48px);
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      overflow:auto;
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:10px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--accent),#2b8df6);
+      color:#fff;font-weight:700;
+      box-shadow:0 6px 18px rgba(18,99,235,0.14);
+      flex-shrink:0;
+    }
+    .brand h3{font-size:16px;margin-bottom:2px}
+    .brand p{font-size:12px;color:var(--muted)}
+
+    .clock{
+      margin-top:6px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      background:linear-gradient(90deg,rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+      padding:10px;border-radius:10px;border:1px solid rgba(20,20,40,0.04);
+    }
+    .clock .time{font-weight:600}
+    .small{font-size:12px;color:var(--muted)}
+
+    .stat-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:8px;
+    }
+    .stat{
+      background:var(--card);
+      padding:10px;border-radius:10px;
+      box-shadow:0 4px 12px rgba(12,30,60,0.04);
+      border:1px solid rgba(20,20,40,0.03);
+      text-align:center;
+    }
+    .stat h4{font-size:14px;color:#111;margin-bottom:6px}
+    .stat p{font-size:13px;color:var(--muted)}
+
+    .filters{
+      margin-top:8px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .filters label{font-size:13px;color:var(--muted);font-weight:600}
+    .filters select,input{
+      width:100%;padding:8px;border-radius:10px;border:1px solid rgba(20,20,40,0.06);
+      background:linear-gradient(180deg,#fff,#fbfdff);
+    }
+    .availability-legend{
+      display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;
+    }
+    .badge{
+      padding:6px 8px;border-radius:999px;font-size:12px;color:#fff;
+      display:inline-flex;align-items:center;gap:8px;
+    }
+    .badge.available{background:var(--accent-2)}
+    .badge.closed{background:var(--danger)}
+    .badge.limited{background:#f59e0b}
+
+    /* ===========================================
+       MAIN CONTENT
+    ============================================ */
+    .main{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+    .header-card{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      background: linear-gradient(90deg,#ffffff, #fbfdff);
+      padding:18px;border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(20,20,40,0.04);
+    }
+    .header-left{display:flex;gap:14px;align-items:center}
+    .title{
+      line-height:1;
+    }
+    .title h1{font-size:20px;margin-bottom:4px}
+    .title p{font-size:13px;color:var(--muted)}
+    .actions{display:flex;gap:10px;align-items:center}
+    .search{
+      display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,#f7fbff,#fff);padding:8px;border-radius:10px;border:1px solid rgba(20,20,40,0.04);
+    }
+    .search input{
+      border:0;outline:none;background:transparent;font-size:14px;color:#0f172a;
+    }
+    .btn{
+      padding:8px 12px;border-radius:10px;border:0;background:var(--accent);color:#fff;cursor:pointer;font-weight:600;
+      box-shadow:0 8px 18px rgba(23,95,208,0.12);
+    }
+    .btn.secondary{background:#fff;color:var(--accent);border:1px solid rgba(23,95,208,0.09);box-shadow:none}
+    .btn.ghost{background:transparent;color:var(--muted);border:1px dashed rgba(20,20,40,0.04)}
+
+    /* grid layout for cards */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:18px;
+      align-items:start;
+    }
+
+    /* left column - menu & queue */
+    .card{
+      background:var(--card);
+      border-radius:12px;
+      padding:16px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(20,20,40,0.04);
+    }
+    .menu-controls{
+      display:flex;gap:8px;align-items:center;margin-bottom:10px;
+    }
+    .category-tabs{
+      display:flex;gap:6px;flex-wrap:wrap;
+    }
+    .tab{
+      padding:8px 10px;border-radius:10px;background:linear-gradient(180deg,#fafbff,#fff);
+      border:1px solid rgba(20,20,40,0.03);cursor:pointer;font-weight:600;font-size:13px;color:var(--muted)
+    }
+    .tab.active{background:linear-gradient(90deg,#eaf5ff,#e8fbf2);color:var(--accent);border-color:rgba(23,95,208,0.12)}
+
+    .menu-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap:12px;margin-top:12px;
+    }
+    .menu-item{
+      display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#ffffff,#fbfdff);
+      border:1px solid rgba(20,20,40,0.03);
+      transition:transform .14s, box-shadow .14s;
+    }
+    .menu-item:hover{transform:translateY(-6px);box-shadow:0 14px 30px rgba(20,40,80,0.06)}
+    .menu-item .name{font-weight:700;font-size:14px}
+    .menu-item .meta{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+    .menu-item .meta .price{font-weight:700;color:#0f172a}
+    .menu-item .meta .avail{font-size:12px;padding:6px 8px;border-radius:999px}
+
+    .avail.true{background:var(--accent-2);color:#fff}
+    .avail.false{background:#fbe9e9;color:var(--danger);border:1px solid rgba(225,75,75,0.06)}
+    .avail.limited{background:#fff4e6;color:#f59e0b}
+
+    .order-controls{display:flex;gap:8px;align-items:center;margin-top:8px}
+    .qty{width:68px;padding:8px;border-radius:8px;border:1px solid rgba(20,20,40,0.06)}
+
+    /* right column - order cart / queue */
+    .panel{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .cart-header{display:flex;justify-content:space-between;align-items:center}
+    .cart-list{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto;padding-right:6px}
+    .cart-item{
+      display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:#fbfdff;border:1px solid rgba(20,20,40,0.03)
+    }
+    .cart-item .left{display:flex;gap:8px;align-items:center}
+    .cart-item .qty-pill{padding:6px 10px;border-radius:8px;background:linear-gradient(90deg,#eef9f3,#e7f4ea);font-weight:700}
+    .cart-footer{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px dashed rgba(20,20,40,0.03)}
+    .checkout{background:linear-gradient(90deg,var(--accent),#2b8df6);padding:10px;border-radius:10px;color:#fff;font-weight:700;border:0;cursor:pointer}
+
+    /* queue card */
+    .queue-controls{display:flex;gap:8px;align-items:center}
+    .queue-input{width:100px;padding:8px;border-radius:8px;border:1px solid rgba(20,20,40,0.06)}
+    .log-area{background:#fbfdff;padding:12px;border-radius:10px;border:1px solid rgba(20,20,40,0.03);max-height:180px;overflow:auto;white-space:pre-wrap;font-size:13px;color:var(--muted)}
+
+    /* responsive */
+    @media (max-width:1000px){
+      .container{padding:18px}
+      .grid{grid-template-columns: 1fr}
+      .container{grid-template-columns: 1fr}
+      .sidebar{display:none}
+    }
+    @media (max-width:420px){
+      body{padding:12px}
+      .header-left{flex-direction:column;align-items:flex-start;gap:10px}
+      .actions{width:100%;justify-content:space-between}
+      .search{width:100%}
+    }
+
+    /* subtle utilities */
+    .muted{color:var(--muted)}
+    .tiny{font-size:12px}
+    .pill{padding:6px 10px;border-radius:999px;background:#f4f6fb;font-weight:700}
+    /* scrollbar styles for webkit */
+    .cart-list::-webkit-scrollbar,.menu-grid::-webkit-scrollbar,.sidebar::-webkit-scrollbar{height:8px;width:8px}
+    .cart-list::-webkit-scrollbar-thumb{background:rgba(20,20,40,0.06);border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="container" role="application" aria-label="Cafeteria ordering dashboard">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" aria-hidden="false">
+      <div class="brand" role="banner">
+        <div class="logo" aria-hidden="true">SC</div>
+        <div>
+          <h3>SmartCanteen</h3>
+          <p class="small">Cafeteria Queue & Ordering</p>
+        </div>
+      </div>
+
+      <div class="clock" aria-live="polite">
+        <div>
+          <div class="time" id="liveClock">--:--</div>
+          <div class="small" id="liveDate">Loading date…</div>
+        </div>
+        <div style="text-align:right">
+          <div class="small">Status</div>
+          <div class="pill" id="openStatus">Open</div>
+        </div>
+      </div>
+
+      <div class="stat-grid" aria-hidden="false">
+        <div class="stat">
+          <h4 id="statQueue">Queue: 5</h4>
+          <p>People waiting</p>
+        </div>
+        <div class="stat">
+          <h4 id="statOrders">Orders: 4</h4>
+          <p>Active orders</p>
+        </div>
+        <div class="stat">
+          <h4 id="statSeats">Seats: 50</h4>
+          <p>Total seats</p>
+        </div>
+        <div class="stat">
+          <h4 id="statAvail">Available: 15</h4>
+          <p>Open seats</p>
+        </div>
+      </div>
+
+      <div class="filters" aria-label="Quick filters">
+        <label for="filterCategory">Quick filter</label>
+        <select id="filterCategory" onchange="quickFilterChange()">
+          <option value="all">All Categories</option>
+          <option value="tiffins">Tiffins</option>
+          <option value="meals">Meals</option>
+          <option value="snacks">Snacks</option>
+          <option value="drinks">Drinks</option>
+        </select>
+
+        <label for="capacityFilter">Set seats</label>
+        <input id="capacityFilter" type="number" min="1" value="50" oninput="updateSeatsFromSidebar()" />
+
+        <div style="margin-top:8px">
+          <label class="small">Availability legend</label>
+          <div class="availability-legend">
+            <div class="badge available">Available</div>
+            <div class="badge limited">Limited</div>
+            <div class="badge closed">Not Available</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main" role="main">
+      <div class="header-card">
+        <div class="header-left">
+          <div class="title">
+            <h1>🍽 Cafeteria Queue & Ordering</h1>
+            <p class="muted">Fast, responsive ordering for students & staff — intuitive menu, availability statuses, and queue prediction.</p>
+          </div>
+          <div class="tiny muted" style="margin-left:8px">Built for mobile & desktop</div>
+        </div>
+
+        <div class="actions">
+          <div class="search" role="search" aria-label="Search menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.35-4.35" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="11" cy="11" r="6" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle></svg>
+            <input id="globalSearch" placeholder="Search menu, e.g., dosa, biryani..." oninput="globalSearch()" aria-label="Search menu items"/>
+          </div>
+
+          <button class="btn secondary" onclick="toggleOpenClosed()">Toggle Open/Close</button>
+          <button class="btn" id="liveOrdersBtn" onclick="focusOrders()">Live Orders</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- LEFT: Menu & Queue Tools -->
+        <section class="card" aria-labelledby="menuHeading">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h2 id="menuHeading" style="font-size:16px">🍱 Menu</h2>
+            <div class="tiny muted">Choose category & add to cart</div>
+          </div>
+
+          <div class="menu-controls" style="margin-top:12px">
+            <div class="category-tabs" role="tablist" aria-label="Menu categories">
+              <div class="tab active" data-cat="tiffins" onclick="switchTab(this)" role="tab">Tiffins</div>
+              <div class="tab" data-cat="meals" onclick="switchTab(this)" role="tab">Meals</div>
+              <div class="tab" data-cat="snacks" onclick="switchTab(this)" role="tab">Snacks</div>
+              <div class="tab" data-cat="drinks" onclick="switchTab(this)" role="tab">Drinks</div>
+            </div>
+
+            <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+              <select id="sortMenu" onchange="renderMenu()" aria-label="Sort menu">
+                <option value="popular">Sort: Popular</option>
+                <option value="az">A → Z</option>
+                <option value="za">Z → A</option>
+                <option value="avail">Availability</option>
+              </select>
+              <button class="btn ghost" onclick="resetFilters()">Reset</button>
+            </div>
+          </div>
+
+          <div id="menuGrid" class="menu-grid" aria-live="polite" style="margin-top:12px">
+            <!-- menu items injected via JS -->
+          </div>
+
+          <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+            <div class="tiny muted">Tip: Tap quantity before adding many items</div>
+            <div class="tiny muted">Auto-updates availability every few minutes</div>
+          </div>
+        </section>
+
+        <!-- RIGHT: Cart & Queue -->
+        <aside class="panel">
+          <div class="card" style="padding-bottom:12px">
+            <div class="cart-header">
+              <div>
+                <h3 style="margin-bottom:6px">🧾 Order Cart</h3>
+                <div class="small muted">Name will be required at checkout</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div class="tiny muted">Orders: <span id="miniOrdersCount">0</span></div>
+                <button class="btn secondary" onclick="clearCart()">Clear</button>
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <label class="small" for="cartName">Customer name</label>
+              <input id="cartName" placeholder="e.g., Rahul" style="padding:10px;border-radius:8px;border:1px solid rgba(20,20,40,0.06);width:100%" />
+            </div>
+
+            <div style="margin-top:12px">
+              <div class="cart-list" id="cartList" aria-live="polite">
+                <!-- cart items -->
+              </div>
+            </div>
+
+            <div class="cart-footer">
+              <div class="muted tiny">Total items: <strong id="cartTotal">0</strong></div>
+              <div style="display:flex;gap:10px">
+                <button class="btn ghost" onclick="saveDraft()">Save</button>
+                <button class="checkout" onclick="checkoutOrders()">Checkout</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h3 style="margin-bottom:6px">⏳ Queue & Capacity</h3>
+                <div class="small muted">Predict wait times & manage seats</div>
+              </div>
+              <div class="tiny muted">Live</div>
+            </div>
+
+            <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+              <label class="small" for="queueLength">Queue length</label>
+              <input id="queueLength" class="queue-input" type="number" min="0" value="5" />
+              <button class="btn" onclick="predictWait()">Predict</button>
+            </div>
+
+            <div style="margin-top:12px;display:flex;gap:8px">
+              <label class="small" for="totalSeats">Seats</label>
+              <input id="totalSeats" type="number" min="1" value="50" class="queue-input" />
+              <label class="small" for="currentOccupancy">Occupancy</label>
+              <input id="currentOccupancy" type="number" min="0" value="35" class="queue-input" />
+              <button class="btn secondary" onclick="optimizeCapacity()">Optimize</button>
+            </div>
+
+            <div style="margin-top:12px">
+              <div id="waitLog" class="log-area"></div>
+            </div>
+          </div>
+
+          <div class="card" aria-live="polite">
+            <h3 style="margin-bottom:8px">Activity Log</h3>
+            <div id="activityLog" class="log-area">No activity yet.</div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    /*******************************************************
+      Data: menu items grouped by category with availability,
+      price, popularity score and optional description.
+    *******************************************************/
+    const MENU = {
+      tiffins: [
+        { id: 't1', name: "Bajji", price: 30, available: true, popular: 8, desc: "Crispy bajji with chutney" },
+        { id: 't2', name: "Puri", price: 35, available: true, popular: 7, desc: "Soft puris with potato" },
+        { id: 't3', name: "Idly", price: 25, available: false, popular: 9, desc: "Steamed idly (temporarily out)" },
+        { id: 't4', name: "Dosa", price: 50, available: true, popular: 10, desc: "Crispy dosa with sambar" },
+        { id: 't5', name: "Parota", price: 45, available: false, popular: 6, desc: "Layered parota - unavailable" },
+        { id: 't6', name: "Chapathi", price: 20, available: true, popular: 4, desc: "Fresh chapathi plate" },
+        { id: 't7', name: "Vada", price: 28, available: true, popular: 7, desc: "Golden medu vada" }
+      ],
+      meals: [
+        { id: 'm1', name: "Chicken Biryani", price: 120, available: true, popular: 10, desc: "Spiced chicken biryani" },
+        { id: 'm2', name: "Veg Biryani", price: 100, available: false, popular: 8, desc: "Aromatic veg biryani" },
+        { id: 'm3', name: "Fried Rice", price: 90, available: true, popular: 7, desc: "Veg fried rice" },
+        { id: 'm4', name: "Veg Fried Rice", price: 85, available: true, popular: 6, desc: "Classic veg fried rice" },
+        { id: 'm5', name: "Curd Rice", price: 60, available: true, popular: 3, desc: "Comfort curd rice" }
+      ],
+      snacks: [
+        { id: 's1', name: "Samosa", price: 25, available: true, popular: 9, desc: "Potato samosa" },
+        { id: 's2', name: "Puffs", price: 35, available: false, popular: 4, desc: "Veg puff - sold out" },
+        { id: 's3', name: "Cutlet", price: 30, available: true, popular: 5, desc: "Veg cutlet" },
+        { id: 's4', name: "Pakoda", price: 28, available: true, popular: 6, desc: "Potato pakoda" }
+      ],
+      drinks: [
+        { id: 'd1', name: "Thums Up", price: 40, available: true, popular: 8, desc: "330ml chilled" },
+        { id: 'd2', name: "Sprite", price: 40, available: true, popular: 7, desc: "330ml" },
+        { id: 'd3', name: "Sting", price: 35, available: false, popular: 3, desc: "Energy drink - not available" },
+        { id: 'd4', name: "Cold Coffee", price: 60, available: true, popular: 9, desc: "Iced cold coffee" },
+        { id: 'd5', name: "Lassi", price: 45, available: true, popular: 6, desc: "Sweet lassi" }
+      ]
+    };
+
+    /*******************************************************
+      State
+    *******************************************************/
+    let currentCategory = 'tiffins';
+    let cart = [];
+    let draftSaved = null;
+    let activityLines = [];
+    let isOpen = true;
+
+    /*******************************************************
+      Utilities
+    *******************************************************/
+    function el(selector){ return document.querySelector(selector) }
+    function els(selector){ return Array.from(document.querySelectorAll(selector)) }
+
+    function logActivity(text){
+      const stamp = new Date().toLocaleTimeString();
+      activityLines.unshift([${stamp}] ${text});
+      if(activityLines.length>200) activityLines.pop();
+      el('#activityLog').textContent = activityLines.join('\n');
+    }
+
+    /*******************************************************
+      Clock & initial UI setup
+    *******************************************************/
+    function updateClock(){
+      const now = new Date();
+      el('#liveClock').textContent = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      el('#liveDate').textContent = now.toLocaleDateString([], {weekday:'short', year:'numeric', month:'short', day:'numeric'});
+      setTimeout(updateClock, 1000);
+    }
+    updateClock();
+
+    // initialize seats and stats
+    function initStats(){
+      const total = parseInt(el('#totalSeats').value || 50);
+      const occ = parseInt(el('#currentOccupancy').value || 35);
+      el('#statSeats').textContent = Seats: ${total};
+      el('#statAvail').textContent = Available: ${Math.max(0, total - occ)};
+      el('#statQueue').textContent = Queue: ${parseInt(el('#queueLength').value || 0)};
+    }
+    initStats();
+
+    /*******************************************************
+      Menu rendering & interactions
+    *******************************************************/
+    function switchTab(node){
+      els('.tab').forEach(t=>t.classList.remove('active'));
+      node.classList.add('active');
+      currentCategory = node.dataset.cat;
+      el('#filterCategory').value = currentCategory;
+      renderMenu();
+    }
+
+    function quickFilterChange(){
+      const cat = el('#filterCategory').value;
+      if(cat === 'all') {
+        // keep current
+      } else {
+        const tab = els('.tab').find(t=>t.dataset.cat===cat);
+        if(tab) switchTab(tab);
+      }
+      renderMenu();
+    }
+
+    function resetFilters(){
+      el('#globalSearch').value = '';
+      el('#searchQuery')?.value && (el('#searchQuery').value='');
+      el('#sortMenu').value = 'popular';
+      renderMenu();
+    }
+
+    function renderMenu(){
+      const grid = el('#menuGrid');
+      grid.innerHTML = '';
+      let items = MENU[currentCategory].slice();
+
+      // global search filter
+      const global = el('#globalSearch').value.trim().toLowerCase();
+      if(global){
+        items = items.filter(i => (i.name + ' ' + (i.desc||'')).toLowerCase().includes(global));
+      }
+
+      // sort
+      const sortMode = el('#sortMenu').value;
+      if(sortMode === 'az') items.sort((a,b)=>a.name.localeCompare(b.name));
+      else if(sortMode === 'za') items.sort((a,b)=>b.name.localeCompare(a.name));
+      else if(sortMode === 'avail') items.sort((a,b)=> (b.available - a.available) || b.popular - a.popular);
+      else items.sort((a,b)=> b.popular - a.popular); // popular default
+
+      // create cards
+      items.forEach(item=>{
+        const card = document.createElement('div');
+        card.className = 'menu-item';
+        card.setAttribute('data-id', item.id);
+
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = item.name;
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const desc = document.createElement('div'); desc.className='tiny muted'; desc.textContent = item.desc || '';
+        const price = document.createElement('div'); price.className='price'; price.textContent = ₹${item.price};
+
+        const avail = document.createElement('div');
+        avail.className = 'avail ' + (item.available? 'true' : 'false');
+        avail.textContent = item.available ? 'Available' : 'Not available';
+
+        // left group
+        const top = document.createElement('div');
+        top.style.display='flex'; top.style.justifyContent='space-between'; top.style.alignItems='center';
+        top.appendChild(name);
+        top.appendChild(price);
+
+        meta.appendChild(desc);
+        meta.appendChild(avail);
+
+        // order controls
+        const controls = document.createElement('div');
+        controls.className = 'order-controls';
+        const qty = document.createElement('input'); qty.type='number'; qty.min=1; qty.value=1; qty.className='qty'; qty.setAttribute('aria-label','Quantity');
+        const add = document.createElement('button'); add.className='btn'; add.textContent = 'Add';
+        add.onclick = ()=> addToCart(item.id, parseInt(qty.value||1));
+
+        // if not available, change add button state
+        if(!item.available){
+          add.disabled = true;
+          add.style.opacity = 0.6;
+          add.title = "Item not available";
+        }
+
+        controls.appendChild(qty);
+        controls.appendChild(add);
+
+        card.appendChild(top);
+        card.appendChild(meta);
+        card.appendChild(controls);
+
+        grid.appendChild(card);
+      });
+    }
+
+    // initial render
+    renderMenu();
+
+    /*******************************************************
+      Cart logic
+    *******************************************************/
+    function findMenuItemById(id){
+      const catList = Object.values(MENU).flat();
+      return catList.find(i=>i.id===id);
+    }
+
+    function addToCart(id, qty = 1){
+      const item = findMenuItemById(id);
+      if(!item) return;
+      if(!item.available){
+        alert(${item.name} is currently not available.);
+        return;
+      }
+      const existing = cart.find(c=>c.id===id);
+      if(existing){
+        existing.qty += qty;
+      } else {
+        cart.push({ ...item, qty });
+      }
+      updateCartUI();
+      logActivity(Added ${qty} x ${item.name} to cart);
+    }
+
+    function updateCartUI(){
+      const list = el('#cartList'); list.innerHTML = '';
+      let totalItems = 0;
+      cart.forEach(ci=>{
+        totalItems += ci.qty;
+        const row = document.createElement('div'); row.className='cart-item';
+        const left = document.createElement('div'); left.className='left';
+        const name = document.createElement('div'); name.style.fontWeight=700; name.textContent = ci.name;
+        const small = document.createElement('div'); small.className='tiny muted'; small.textContent = ₹${ci.price} each;
+        left.appendChild(name);
+        left.appendChild(small);
+
+        const right = document.createElement('div'); right.style.display='flex'; right.style.gap='8px'; right.style.alignItems='center';
+        const qtyPill = document.createElement('div'); qtyPill.className='qty-pill'; qtyPill.textContent = x${ci.qty};
+        const plus = document.createElement('button'); plus.className='btn ghost'; plus.textContent='+'; plus.onclick = ()=>changeQty(ci.id, 1);
+        const minus = document.createElement('button'); minus.className='btn ghost'; minus.textContent='-'; minus.onclick = ()=>changeQty(ci.id, -1);
+        const rem = document.createElement('button'); rem.className='btn secondary'; rem.textContent='Remove'; rem.onclick = ()=>removeCart(ci.id);
+
+        right.appendChild(qtyPill);
+        right.appendChild(plus);
+        right.appendChild(minus);
+        right.appendChild(rem);
+
+        row.appendChild(left);
+        row.appendChild(right);
+        list.appendChild(row);
+      });
+
+      el('#cartTotal').textContent = totalItems;
+      el('#miniOrdersCount').textContent = cart.length;
+      el('#cartTotal').textContent = totalItems;
+      el('#statOrders').textContent = Orders: ${cart.length};
+      el('#statQueue').textContent = Queue: ${parseInt(el('#queueLength').value || 0)};
+    }
+
+    function changeQty(id, diff){
+      const it = cart.find(c=>c.id===id);
+      if(!it) return;
+      it.qty += diff;
+      if(it.qty < 1) it.qty = 1;
+      updateCartUI();
+      logActivity(Updated qty for ${it.name} to ${it.qty});
+    }
+
+    function removeCart(id){
+      cart = cart.filter(c=>c.id!==id);
+      updateCartUI();
+      logActivity(Removed item from cart);
+    }
+
+    function clearCart(){
+      cart = [];
+      updateCartUI();
+      logActivity('Cart cleared');
+    }
+
+    function saveDraft(){
+      draftSaved = { name: el('#cartName').value, items: JSON.parse(JSON.stringify(cart)), timestamp: new Date().toISOString() };
+      logActivity('Draft saved');
+      alert('Draft saved locally (session only).');
+    }
+
+    function checkoutOrders(){
+      const name = el('#cartName').value.trim();
+      if(!name){
+        alert('Please enter customer name before checkout.');
+        return;
+      }
+      if(cart.length === 0){
+        alert('Cart is empty.');
+        return;
+      }
+      // prepare order summary
+      const orderSummary = cart.map(c=> ${c.qty}x ${c.name}).join(', ');
+      // push to activity & clear
+      logActivity(Order placed by ${name}: ${orderSummary});
+      alert(Order placed!\n${orderSummary});
+      // simulate decrementing queue & stats updates
+      const qEl = el('#queueLength'); qEl.value = Math.max(0, parseInt(qEl.value||0) + Math.ceil(cart.length/2));
+      cart = [];
+      el('#cartName').value = '';
+      updateCartUI();
+      renderMenu();
+    }
+
+    /*******************************************************
+      Queue & Capacity features
+    *******************************************************/
+    function predictWait(){
+      const queue = parseInt(el('#queueLength').value || 0);
+      // estimate time per person depending on occupancy & average item complexity
+      const basePerPerson = 2.5; // minutes
+      const avgComplexity = Math.max(1, Math.min(3, 1 + (el('#statOrders').textContent.includes('Orders') ? 0.5 : 0)));
+      const predicted = Math.ceil(queue * basePerPerson * avgComplexity);
+      el('#waitLog').textContent = Estimated wait: ~ ${predicted} min for ${queue} people.;
+      logActivity(Predicted wait time ${predicted} minutes for queue length ${queue});
+    }
+
+    function optimizeCapacity(){
+      const total = parseInt(el('#totalSeats').value || 50);
+      const occ = parseInt(el('#currentOccupancy').value || 0);
+      const available = Math.max(0, total - occ);
+      const suggestion = available < 8 ? "Consider opening overflow seating or limit new entries." : "Capacity looks good.";
+      el('#waitLog').textContent = Available seats: ${available}\n${suggestion};
+      el('#statSeats').textContent = Seats: ${total};
+      el('#statAvail').textContent = Available: ${available};
+      logActivity(Capacity optimized. ${available} seats available.);
+    }
+
+    function updateSeatsFromSidebar(){
+      const val = parseInt(el('#capacityFilter').value||50);
+      el('#totalSeats').value = val;
+      initStats();
+    }
+
+    /*******************************************************
+      Search & global filter
+    *******************************************************/
+    function globalSearch(){
+      renderMenu();
+    }
+
+    /*******************************************************
+      Availability auto-refresh (simulated)
+    *******************************************************/
+    function randomizeAvailability(){
+      // small simulated fluctuations (for demo)
+      Object.values(MENU).flat().forEach(it=>{
+        // 10% chance to toggle availability (but keep some items stable)
+        if(Math.random() < 0.08){
+          it.available = !it.available;
+        }
+      });
+      renderMenu();
+      logActivity('Menu availability updated');
+    }
+    setInterval(randomizeAvailability, 1000 * 60 * 2); // every 2 minutes
+
+    /*******************************************************
+      Misc helpers & UX
+    *******************************************************/
+    function toggleOpenClosed(){
+      isOpen = !isOpen;
+      el('#openStatus').textContent = isOpen ? 'Open' : 'Closed';
+      el('#openStatus').style.background = isOpen ? 'linear-gradient(90deg,#e6fbf1,#dff7ee)' : 'linear-gradient(90deg,#fff0f0,#ffefef)';
+      el('#openStatus').style.color = isOpen ? '#0a804d' : '#a42f2f';
+      logActivity(isOpen ? 'Canteen opened' : 'Canteen closed');
+    }
+
+    function focusOrders(){ window.scrollTo({ top: document.body.scrollHeight, behavior:'smooth' }); }
+
+    function removeUnavailableFromMenu(){
+      Object.values(MENU).flat().forEach(i=>{
+        if(!i.available){
+          // add a note to description
+          if(!i.desc || !i.desc.includes('(Not available')) i.desc = (i.desc || '') + ' (Not available)';
+        } else {
+          if(i.desc) i.desc = i.desc.replace('(Not available)', '').trim();
+        }
+      });
+      renderMenu();
+    }
+
+    // small periodic UI updates
+    setInterval(()=>{
+      el('#statQueue').textContent = Queue: ${parseInt(el('#queueLength').value || 0)};
+      el('#statOrders').textContent = Orders: ${cart.length};
+    }, 2000);
+
+    /*******************************************************
+      Accessibility: keyboard shortcuts
+    *******************************************************/
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'c' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); clearCart(); }
+      if(e.key === 's' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); saveDraft(); }
+      if(e.key === 'p' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); predictWait(); }
+    });
+
+    // expose some functions for debugging in console (optional)
+    window._SC = { MENU, addToCart, cart, renderMenu, randomizeAvailability };
+
+    // initial small log
+    logActivity('Dashboard ready');
+  </script>
+</body>
+</html>

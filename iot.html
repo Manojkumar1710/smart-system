@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus IoT Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary { background: #6c63ff; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        select, input[type="text"] {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: #6c63ff;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #6c63ff;
+            display: block;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .status-online { background: #28a745; }
+        .status-offline { background: #dc3545; }
+        .status-warning { background: #ffc107; }
+
+        .messages-card {
+            grid-column: 1 / -1;
+        }
+
+        .messages-area {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .message-info { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+        .message-warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .message-error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .popup.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .popup.show .popup-content {
+            transform: scale(1);
+        }
+
+        .popup-content h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .popup-content p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #6c63ff;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6c63ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .blinking {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .input-group {
+                margin-left: 0;
+                margin-top: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                🏫 Smart Campus IoT Integration
+            </h1>
+            <p>Real-time monitoring and control of campus infrastructure</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="initializeBtn">Initialize System</button>
+            <button class="btn btn-info" id="collectBtn" disabled>Collect Data</button>
+            <button class="btn btn-success" id="startBtn" disabled>Start Monitoring</button>
+            <button class="btn btn-danger" id="stopBtn" disabled>Stop Monitoring</button>
+            <button class="btn btn-secondary" id="exportBtn" disabled>Export Data</button>
+            
+            <div class="input-group">
+                <select id="locationSelect">
+                    <option value="all">All Locations</option>
+                    <option value="library">Library</option>
+                    <option value="cafeteria">Cafeteria</option>
+                    <option value="auditorium">Auditorium</option>
+                    <option value="labs">Computer Labs</option>
+                    <option value="dormitory">Dormitory</option>
+                </select>
+                <input type="text" id="customMessage" placeholder="Enter custom message">
+                <button class="btn btn-info" id="sendBtn">Send Message</button>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <h3>📊 Campus Overview</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number" id="locationsCount">0</span>
+                        <div class="stat-label">Locations</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="sensorsCount">0</span>
+                        <div class="stat-label">Sensors</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="camerasCount">0</span>
+                        <div class="stat-label">Active Cameras</div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="peopleCount">0</span>
+                        <div class="stat-label">People Detected</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>⚡ System Status</h3>
+                <div class="status-item">
+                    <span><span class="status-dot status-offline" id="systemDot"></span>System Status:</span>
+                    <span id="systemStatus">Offline</span>
+                </div>
+                <div class="status-item">
+                    <span><span class="status-dot status-offline" id="monitoringDot"></span>Monitoring:</span>
+                    <span id="monitoringStatus">Stopped</span>
+                </div>
+                <div class="status-item">
+                    <span><span class="status-dot status-offline" id="updateDot"></span>Last Update:</span>
+                    <span id="lastUpdate">Never</span>
+                </div>
+                <div class="status-item">
+                    <span>Avg Temperature:</span>
+                    <span id="avgTemp">--°C</span>
+                </div>
+                <div class="status-item">
+                    <span>Avg Occupancy:</span>
+                    <span id="avgOccupancy">--%</span>
+                </div>
+                <div class="status-item">
+                    <span>Total Power:</span>
+                    <span id="totalPower">--kW</span>
+                </div>
+            </div>
+
+            <div class="card messages-card">
+                <h3>📝 System Messages</h3>
+                <div class="messages-area" id="messagesArea">
+                    <div class="message message-info">
+                        System ready for initialization. Click 'Initialize System' to begin.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup Modal -->
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <div class="loading-spinner" id="loadingSpinner" style="display: none;"></div>
+            <h3 id="popupTitle">System Status</h3>
+            <p id="popupMessage">Processing your request...</p>
+            <div class="progress-bar" id="progressBar" style="display: none;">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <button class="btn btn-primary" id="popupClose">OK</button>
+        </div>
+    </div>
+
+    <script>
+        class SmartCampusSystem {
+            constructor() {
+                this.isInitialized = false;
+                this.isMonitoring = false;
+                this.locations = 0;
+                this.sensors = 0;
+                this.cameras = 0;
+                this.people = 0;
+                this.temperature = 0;
+                this.occupancy = 0;
+                this.power = 0;
+                this.monitoringInterval = null;
+                this.initializeElements();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    initializeBtn: document.getElementById('initializeBtn'),
+                    collectBtn: document.getElementById('collectBtn'),
+                    startBtn: document.getElementById('startBtn'),
+                    stopBtn: document.getElementById('stopBtn'),
+                    exportBtn: document.getElementById('exportBtn'),
+                    sendBtn: document.getElementById('sendBtn'),
+                    locationSelect: document.getElementById('locationSelect'),
+                    customMessage: document.getElementById('customMessage'),
+                    popup: document.getElementById('popup'),
+                    popupTitle: document.getElementById('popupTitle'),
+                    popupMessage: document.getElementById('popupMessage'),
+                    popupClose: document.getElementById('popupClose'),
+                    loadingSpinner: document.getElementById('loadingSpinner'),
+                    progressBar: document.getElementById('progressBar'),
+                    progressFill: document.getElementById('progressFill'),
+                    messagesArea: document.getElementById('messagesArea'),
+                    systemStatus: document.getElementById('systemStatus'),
+                    monitoringStatus: document.getElementById('monitoringStatus'),
+                    lastUpdate: document.getElementById('lastUpdate'),
+                    systemDot: document.getElementById('systemDot'),
+                    monitoringDot: document.getElementById('monitoringDot'),
+                    updateDot: document.getElementById('updateDot'),
+                    locationsCount: document.getElementById('locationsCount'),
+                    sensorsCount: document.getElementById('sensorsCount'),
+                    camerasCount: document.getElementById('camerasCount'),
+                    peopleCount: document.getElementById('peopleCount'),
+                    avgTemp: document.getElementById('avgTemp'),
+                    avgOccupancy: document.getElementById('avgOccupancy'),
+                    totalPower: document.getElementById('totalPower')
+                };
+            }
+
+            bindEvents() {
+                this.elements.initializeBtn.addEventListener('click', () => this.initializeSystem());
+                this.elements.collectBtn.addEventListener('click', () => this.collectData());
+                this.elements.startBtn.addEventListener('click', () => this.startMonitoring());
+                this.elements.stopBtn.addEventListener('click', () => this.stopMonitoring());
+                this.elements.exportBtn.addEventListener('click', () => this.exportData());
+                this.elements.sendBtn.addEventListener('click', () => this.sendCustomMessage());
+                this.elements.popupClose.addEventListener('click', () => this.closePopup());
+                
+                // Close popup when clicking outside
+                this.elements.popup.addEventListener('click', (e) => {
+                    if (e.target === this.elements.popup) {
+                        this.closePopup();
+                    }
+                });
+            }
+
+            showPopup(title, message, showSpinner = false, showProgress = false) {
+                this.elements.popupTitle.textContent = title;
+                this.elements.popupMessage.textContent = message;
+                this.elements.loadingSpinner.style.display = showSpinner ? 'block' : 'none';
+                this.elements.progressBar.style.display = showProgress ? 'block' : 'none';
+                
+                if (showProgress) {
+                    this.elements.progressFill.style.width = '0%';
+                }
+                
+                this.elements.popup.classList.add('show');
+            }
+
+            closePopup() {
+                this.elements.popup.classList.remove('show');
+            }
+
+            addMessage(message, type = 'info') {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message message-${type}`;
+                messageDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                
+                this.elements.messagesArea.appendChild(messageDiv);
+                this.elements.messagesArea.scrollTop = this.elements.messagesArea.scrollHeight;
+                
+                // Remove old messages if too many
+                const messages = this.elements.messagesArea.children;
+                if (messages.length > 20) {
+                    messages[0].remove();
+                }
+            }
+
+            updateStats() {
+                this.elements.locationsCount.textContent = this.locations;
+                this.elements.sensorsCount.textContent = this.sensors;
+                this.elements.camerasCount.textContent = this.cameras;
+                this.elements.peopleCount.textContent = this.people;
+                this.elements.avgTemp.textContent = this.temperature ? `${this.temperature}°C` : '--°C';
+                this.elements.avgOccupancy.textContent = this.occupancy ? `${this.occupancy}%` : '--%';
+                this.elements.totalPower.textContent = this.power ? `${this.power}kW` : '--kW';
+            }
+
+            updateSystemStatus(status, isOnline = false) {
+                this.elements.systemStatus.textContent = status;
+                this.elements.systemDot.className = `status-dot ${isOnline ? 'status-online' : 'status-offline'}`;
+            }
+
+            updateMonitoringStatus(status, isActive = false) {
+                this.elements.monitoringStatus.textContent = status;
+                this.elements.monitoringDot.className = `status-dot ${isActive ? 'status-online' : 'status-offline'}`;
+            }
+
+            updateLastUpdate() {
+                const now = new Date().toLocaleTimeString();
+                this.elements.lastUpdate.textContent = now;
+                this.elements.updateDot.className = 'status-dot status-online';
+            }
+
+            async initializeSystem() {
+                this.showPopup('Initializing System', 'Please wait while the system initializes...', true, true);
+                this.addMessage('Starting system initialization...', 'info');
+                
+                // Simulate initialization progress
+                for (let i = 0; i <= 100; i += 10) {
+                    this.elements.progressFill.style.width = i + '%';
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                    if (i === 30) this.addMessage('Connecting to IoT sensors...', 'info');
+                    if (i === 60) this.addMessage('Calibrating cameras...', 'info');
+                    if (i === 90) this.addMessage('System ready!', 'success');
+                }
+
+                this.isInitialized = true;
+                this.locations = 5;
+                this.sensors = 47;
+                this.cameras = 12;
+                
+                this.updateStats();
+                this.updateSystemStatus('Online', true);
+                this.updateLastUpdate();
+                
+                // Enable buttons
+                this.elements.collectBtn.disabled = false;
+                this.elements.startBtn.disabled = false;
+                this.elements.exportBtn.disabled = false;
+                this.elements.initializeBtn.disabled = true;
+                
+                this.closePopup();
+                this.showPopup('System Initialized', 'Smart Campus IoT system is now online and ready for operation!');
+                this.addMessage('System initialization completed successfully', 'success');
+            }
+
+            async collectData() {
+                this.showPopup('Collecting Data', 'Gathering data from all sensors...', true);
+                this.addMessage('Starting data collection from all sensors...', 'info');
+                
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Simulate data collection
+                this.people = Math.floor(Math.random() * 150) + 50;
+                this.temperature = Math.floor(Math.random() * 8) + 20; // 20-28°C
+                this.occupancy = Math.floor(Math.random() * 40) + 30; // 30-70%
+                this.power = (Math.random() * 50 + 25).toFixed(1); // 25-75kW
+                
+                this.updateStats();
+                this.updateLastUpdate();
+                
+                this.closePopup();
+                this.showPopup('Data Collection Complete', `Successfully collected data from ${this.sensors} sensors across ${this.locations} locations.`);
+                this.addMessage(`Data collected: ${this.people} people detected, avg temp ${this.temperature}°C`, 'success');
+            }
+
+            async startMonitoring() {
+                if (!this.isInitialized) {
+                    this.showPopup('Error', 'Please initialize the system first!');
+                    return;
+                }
+
+                this.showPopup('Starting Monitoring', 'Activating real-time monitoring system...', true);
+                this.addMessage('Starting continuous monitoring...', 'info');
+                
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                this.isMonitoring = true;
+                this.updateMonitoringStatus('Active', true);
+                
+                // Start continuous data updates
+                this.monitoringInterval = setInterval(() => {
+                    this.people = Math.floor(Math.random() * 200) + 30;
+                    this.temperature = Math.floor(Math.random() * 10) + 18;
+                    this.occupancy = Math.floor(Math.random() * 60) + 20;
+                    this.power = (Math.random() * 60 + 20).toFixed(1);
+                    
+                    this.updateStats();
+                    this.updateLastUpdate();
+                    
+                    // Random alerts
+                    if (Math.random() < 0.1) {
+                        const alerts = [
+                            'High occupancy detected in Library',
+                            'Temperature spike in Computer Labs',
+                            'Motion detected in restricted area',
+                            'Energy consumption optimized',
+                            'All systems operating normally'
+                        ];
+                        const alert = alerts[Math.floor(Math.random() * alerts.length)];
+                        this.addMessage(alert, Math.random() < 0.3 ? 'warning' : 'info');
+                    }
+                }, 3000);
+                
+                this.elements.startBtn.disabled = true;
+                this.elements.stopBtn.disabled = false;
+                this.elements.startBtn.classList.add('blinking');
+                
+                setTimeout(() => {
+                    this.elements.startBtn.classList.remove('blinking');
+                }, 3000);
+                
+                this.closePopup();
+                this.showPopup('Monitoring Started', 'Real-time monitoring is now active. System will update every few seconds.');
+                this.addMessage('Real-time monitoring activated successfully', 'success');
+            }
+
+            stopMonitoring() {
+                if (!this.isMonitoring) {
+                    this.showPopup('Error', 'Monitoring is not currently active!');
+                    return;
+                }
+
+                this.showPopup('Stopping Monitoring', 'Deactivating monitoring system...');
+                this.addMessage('Stopping continuous monitoring...', 'warning');
+                
+                this.isMonitoring = false;
+                clearInterval(this.monitoringInterval);
+                this.updateMonitoringStatus('Stopped', false);
+                
+                this.elements.startBtn.disabled = false;
+                this.elements.stopBtn.disabled = true;
+                
+                setTimeout(() => {
+                    this.closePopup();
+                    this.addMessage('Monitoring stopped successfully', 'info');
+                }, 1000);
+            }
+
+            async exportData() {
+                const selectedLocation = this.elements.locationSelect.value;
+                const locationText = selectedLocation === 'all' ? 'All Locations' : selectedLocation;
+                
+                this.showPopup('Exporting Data', `Preparing data export for ${locationText}...`, true, true);
+                this.addMessage(`Starting data export for ${locationText}...`, 'info');
+                
+                // Simulate export process
+                for (let i = 0; i <= 100; i += 20) {
+                    this.elements.progressFill.style.width = i + '%';
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    if (i === 40) this.addMessage('Compiling sensor data...', 'info');
+                    if (i === 80) this.addMessage('Generating report...', 'info');
+                }
+
+                // Simulate file download
+                const data = {
+                    location: selectedLocation,
+                    timestamp: new Date().toISOString(),
+                    locations: this.locations,
+                    sensors: this.sensors,
+                    cameras: this.cameras,
+                    people: this.people,
+                    temperature: this.temperature,
+                    occupancy: this.occupancy,
+                    power: this.power
+                };
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `campus-data-${selectedLocation}-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.closePopup();
+                this.showPopup('Export Complete', `Data has been exported successfully for ${locationText}. File downloaded to your device.`);
+                this.addMessage(`Data export completed for ${locationText}`, 'success');
+            }
+
+            sendCustomMessage() {
+                const message = this.elements.customMessage.value.trim();
+                const location = this.elements.locationSelect.value;
+                
+                if (!message) {
+                    this.showPopup('Error', 'Please enter a message to send!');
+                    return;
+                }
+
+                const locationText = location === 'all' ? 'All Locations' : location;
+                this.showPopup('Message Sent', `Custom message sent to ${locationText}: "${message}"`);
+                this.addMessage(`Custom message sent to ${locationText}: ${message}`, 'info');
+                
+                this.elements.customMessage.value = '';
+                
+                // Simulate message acknowledgment
+                setTimeout(() => {
+                    this.addMessage(`Message acknowledged by ${locationText}`, 'success');
+                }, 2000);
+            }
+        }
+
+        // Initialize the system when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new SmartCampusSystem();
+        });
+    </script>
+</body>
+</html>
